@@ -19,10 +19,10 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
     Route::get('/', 'HomeController@index')->name('home.index');
 
     Route::group(['middleware' => ['guest']], function() {
-        Route::get('/register', 'RegisterController@show')->name('register.show');
+        Route::get('/register', 'RegisterController@show')->name('register');
         Route::post('/register', 'RegisterController@register')->name('register.perform');
 
-        Route::get('/login', 'LoginController@show')->name('login.show');
+        Route::get('/login', 'LoginController@show')->name('login');
         Route::post('/login', 'LoginController@login')->name('login.perform');
 
     });
@@ -30,6 +30,6 @@ Route::group(['namespace' => 'App\Http\Controllers'], function()
     Route::group(['middleware' => ['auth']], function() {
         Route::get('/logout', 'LogoutController@perform')->name('logout.perform');
 
-        Route::resource('timesheet', TimesheetController::class);    
+        Route::resource('timesheets', TimesheetController::class);    
     });
 });

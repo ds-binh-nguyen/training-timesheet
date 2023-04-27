@@ -2,10 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TimesheetService;
 use Illuminate\Http\Request;
 
 class TimesheetController extends Controller
 {
+    protected $timesheetService;
+
+    public function __construct(TimesheetService $timesheetService)
+    {
+        $this->timesheetService = $timesheetService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +21,7 @@ class TimesheetController extends Controller
      */
     public function index()
     {
-        //
+        return view('timesheets.index');
     }
 
     /**
@@ -23,7 +31,7 @@ class TimesheetController extends Controller
      */
     public function create()
     {
-        //
+        return view('timesheets.create');
     }
 
     /**
@@ -34,7 +42,17 @@ class TimesheetController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $params = $request->only([
+            'time_check_in',
+            'time_check_out',
+            'difficult',
+            'planning',
+            'tasks',
+        ]);
+        $params['user_id'] = auth()->user()->id;
+        $this->timesheetService->createTimesheet($params);
+
+        return view('timesheets.index');
     }
 
     /**

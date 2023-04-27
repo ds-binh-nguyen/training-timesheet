@@ -4,8 +4,10 @@
     <form method="post" action="{{ route('register.perform') }}">
 
         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-        <img class="mb-4" src="{!! url('images/bootstrap-logo.svg') !!}" alt="" width="72" height="57">
-        
+        <a href="/">
+            <img class="mb-4" src="{!! url('images/bootstrap-logo.svg') !!}" alt="" width="72" height="57">
+        </a>
+
         <h1 class="h3 mb-3 fw-normal">Register</h1>
 
         <div class="form-group form-floating mb-3">
@@ -41,5 +43,9 @@
         </div>
 
         <button class="w-100 btn btn-lg btn-primary" type="submit">Register</button>
+        <p class="mt-3 text-center">
+            Already have an account?
+            <a href="/login" class="text-underline">Sign in instead.</a>
+         </p>
     </form>
 @endsection
