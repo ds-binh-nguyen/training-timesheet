@@ -2,45 +2,55 @@
 
 namespace App\Services;
 
-use App\Repositories\IRepository\TaskRepository;
-use App\Repositories\IRepository\TimesheetRepository;
+use App\Models\Timesheet;
+use App\Services\Interfaces\TimesheetServiceInterface;
 
-class TimesheetService
+class TimesheetService extends BaseService implements TimesheetServiceInterface
 {
-    protected $timesheetRepo;
-    protected $taskRepo;
-
-    public function __construct(
-        TimesheetRepository $timesheetRepo,
-        TaskRepository $taskRepo
-    )
+    public function getAll()
     {
-        $this->timesheetRepo = $timesheetRepo;
-        $this->taskRepo = $taskRepo;
+        return Timesheet::where('user_id', auth()->user()->id)
+            ->with('tasks')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
     }
 
-    public function getAllTimesheets()
+    public function create(array $data)
     {
-        return $this->timesheetRepo->getAll();
-    }
-
-    public function createTimesheet($data)
-    {
-        $timesheet = $this->timesheetRepo->create($data);
-
-        $tasks = [];
-
-        foreach ($data['tasks'] as $task) {
-            $tasks[] = [
-                'timesheet_id' => $timesheet->id,
-                'task_id' => $task['task_id'],
-                'content' => $task['content'],
-                'spent_time' => $task['spent_time']
-            ];
-        }
-
-        $this->taskRepo->createMany($tasks);
+        $timesheet = Timesheet::create($data);
+        $timesheet->tasks()->createMany($data['tasks']);
 
         return $timesheet;
+    }
+
+    public function getByIdWithTasks(int $id)
+    {
+        return Timesheet::with('tasks')->find($id);
+    }
+
+    public function getById(int $id)
+    {
+        return Timesheet::find($id);
+    }
+
+    public function update(int $id, array $data)
+    {
+        $timesheet = $this->getById($id);
+        $timesheet->update($data);
+
+        $timesheet->tasks()->delete();
+        $tasks = array_filter($data['tasks'], function($task) {
+            return !empty(array_filter($task));
+        });
+        if (!empty($tasks)) {
+            $timesheet->tasks()->createMany($tasks);
+        }
+
+        return $timesheet;
+    }
+
+    public function destroy(int $id)
+    {
+        return $this->getById($id)->delete();
     }
 }

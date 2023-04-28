@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\TimesheetService;
+use App\Services\Interfaces\TimesheetServiceInterface;
 use Illuminate\Http\Request;
 
 class TimesheetController extends Controller
 {
     protected $timesheetService;
 
-    public function __construct(TimesheetService $timesheetService)
+    public function __construct(TimesheetServiceInterface $timesheetService)
     {
         $this->timesheetService = $timesheetService;
     }
@@ -21,7 +21,9 @@ class TimesheetController extends Controller
      */
     public function index()
     {
-        return view('timesheets.index');
+        $timesheets = $this->timesheetService->getAll();
+
+        return view('timesheets.index', compact('timesheets'));
     }
 
     /**
@@ -50,9 +52,9 @@ class TimesheetController extends Controller
             'tasks',
         ]);
         $params['user_id'] = auth()->user()->id;
-        $this->timesheetService->createTimesheet($params);
+        $this->timesheetService->create($params);
 
-        return view('timesheets.index');
+        return redirect()->route('timesheets.index');
     }
 
     /**
@@ -74,7 +76,9 @@ class TimesheetController extends Controller
      */
     public function edit($id)
     {
-        //
+        $timesheet = $this->timesheetService->getByIdWithTasks($id);
+
+        return view('timesheets.edit', compact('timesheet'));
     }
 
     /**
@@ -86,7 +90,17 @@ class TimesheetController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $params = $request->only([
+            'time_check_in',
+            'time_check_out',
+            'difficult',
+            'planning',
+            'tasks',
+        ]);
+
+        $this->timesheetService->update($id, $params);
+
+        return redirect()->route('timesheets.index');
     }
 
     /**
@@ -97,6 +111,8 @@ class TimesheetController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $this->timesheetService->destroy($id);
+
+        return redirect()->route('timesheets.index');
     }
 }
