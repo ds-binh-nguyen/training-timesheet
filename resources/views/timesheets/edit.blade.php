@@ -23,10 +23,10 @@
 
                                 <div class="col-md-8">
                                     {{-- fake date for time_check_in --}}
-                                    <input id="date" type="date" class="form-control @error('date') is-invalid @enderror"
+                                    <input id="date" type="date" class="form-control @error('time_check_in') is-invalid @enderror" disabled
                                         name="time_check_in" value="{{ \Carbon\Carbon::parse($timesheet->time_check_in)->format('Y-m-d') }}">
 
-                                    @error('date')
+                                    @error('time_check_in')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -59,13 +59,13 @@
                                             </svg>
                                         </span>
                                         <div class="col-md-2">
-                                            <input id="task_id" type="text" class="form-control @error('task_id') is-invalid @enderror" name="tasks[0][task_id]">
-                                        </div>
+                                            <input type="text" class="form-control @error('tasks.0.task_id') is-invalid @enderror" name="tasks[0][task_id]">
+                                       </div>
                                         <div class="col-md-2">
-                                            <input id="spent_time" type="text" class="form-control @error('spent_time') is-invalid @enderror" name="tasks[0][spent_time]">    
+                                            <input type="text" class="form-control @error('tasks.0.spent_time') is-invalid @enderror" name="tasks[0][spent_time]">
                                         </div>
                                         <div class="col-md-7">
-                                            <textarea id="content" class="form-control @error('content') is-invalid @enderror" name="tasks[0][content]" rows="2"></textarea>
+                                            <textarea id="content" class="form-control @error('tasks.0.content') is-invalid @enderror" name="tasks[0][content]" rows="2"></textarea>
                                         </div>
                                     </div>
                                 @else
@@ -83,16 +83,31 @@
                                                 <button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>
                                             @endif
                                             <div class="col-md-2">
-                                                <input type="text" class="form-control @error('task_id') is-invalid @enderror"
+                                                <input type="text" class="form-control @error(`tasks.{$index}.task_id`) is-invalid @enderror"
                                                     name="tasks[{{$index}}][task_id]" value="{{ $task->task_id }}">
+                                                @error(`tasks.{$index}.task_id`)
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" class="form-control @error('spent_time') is-invalid @enderror"
+                                                <input type="text" class="form-control @error(`tasks.{$index}.spent_time`) is-invalid @enderror"
                                                     name="tasks[{{$index}}][spent_time]" value="{{ $task->spent_time }}">
+                                                @error(`tasks.{$index}.spent_time`)
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
                                             </div>
                                             <div class="col-md-7">
-                                                <textarea class="form-control @error('content') is-invalid @enderror"
+                                                <textarea class="form-control @error(`tasks.{$index}.content`) is-invalid @enderror"
                                                     name="tasks[{{$index}}][content]" rows="2">{{ $task->content }}</textarea>
+                                                @error(`tasks.{$index}.content`)
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
                                             </div>
                                         </div>
                                     @endforeach

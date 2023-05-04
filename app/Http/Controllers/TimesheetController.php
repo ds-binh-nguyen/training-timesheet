@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TimesheetStoreRequest;
+use App\Http\Requests\TimesheetUpdateRequest;
 use App\Services\Interfaces\TimesheetServiceInterface;
-use Illuminate\Http\Request;
 
 class TimesheetController extends Controller
 {
@@ -42,7 +43,7 @@ class TimesheetController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(TimesheetStoreRequest $request)
     {
         $params = $request->only([
             'time_check_in',
@@ -65,7 +66,9 @@ class TimesheetController extends Controller
      */
     public function show($id)
     {
-        //
+        $timesheet = $this->timesheetService->getByIdWithTasks($id);
+
+        return view('timesheets.show', compact('timesheet'));
     }
 
     /**
@@ -88,10 +91,9 @@ class TimesheetController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(TimesheetUpdateRequest $request, $id)
     {
         $params = $request->only([
-            'time_check_in',
             'time_check_out',
             'difficult',
             'planning',

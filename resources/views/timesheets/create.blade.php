@@ -9,6 +9,17 @@
               <li class="breadcrumb-item active" aria-current="page">Create</li>
             </ol>
         </nav>
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <p>You have {{ count($errors->get('tasks.*')) }} error(s) in the tasks field.</p>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="card">
@@ -17,14 +28,15 @@
                     <div class="card-body">
                         <form method="POST" action="{{ route('timesheets.store') }}">
                             @csrf
+                            <input type="hidden" name="input-counter" id="input-counter" value="0">
                             <div class="form-group row">
                                 <label for="date" class="col-md-4 col-form-label text-md-right">{{ __('Date') }}</label>
 
                                 <div class="col-md-8">
                                     {{-- fake date for time_check_in --}}
-                                    <input id="date" type="date" class="form-control @error('date') is-invalid @enderror" name="time_check_in">
+                                    <input id="date" type="date" class="form-control @error('time_check_in') is-invalid @enderror" name="time_check_in" value="{{ old('time_check_in') }}">
 
-                                    @error('date')
+                                    @error('time_check_in')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
@@ -56,13 +68,31 @@
                                         </svg>
                                     </span>
                                     <div class="col-md-2">
-                                        <input id="task_id" type="text" class="form-control @error('task_id') is-invalid @enderror" name="tasks[0][task_id]">
+                                        <input type="text" class="form-control @error('tasks.0.task_id') is-invalid @enderror" 
+                                            name="tasks[0][task_id]" value="{{ old('tasks.0.task_id') }}">
+                                        @error('tasks.0.task_id')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                     <div class="col-md-2">
-                                        <input id="spent_time" type="text" class="form-control @error('spent_time') is-invalid @enderror" name="tasks[0][spent_time]">    
+                                        <input type="text" class="form-control @error('tasks.0.spent_time') is-invalid @enderror"
+                                            name="tasks[0][spent_time]" value="{{ old('tasks.0.spent_time') }}">
+                                        @error('tasks.0.spent_time')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                     <div class="col-md-7">
-                                        <textarea id="content" class="form-control @error('content') is-invalid @enderror" name="tasks[0][content]" rows="2"></textarea>
+                                        <textarea class="form-control @error('tasks.0.content') is-invalid @enderror"
+                                            name="tasks[0][content]" rows="2">{{ old('tasks.0.content') }}</textarea>
+                                        @error('tasks.0.spent_time')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +129,7 @@
                                 <label for="difficult" class="col-md-4 col-form-label text-md-right">{{ __('Difficult') }}</label>
 
                                 <div class="col-md-8">
-                                    <textarea id="difficult" class="form-control @error('difficult') is-invalid @enderror" name="difficult" rows="5"></textarea>
+                                    <textarea id="difficult" class="form-control @error('difficult') is-invalid @enderror" name="difficult" rows="5">{{ old('difficult') }}</textarea>
 
                                     @error('difficult')
                                         <span class="invalid-feedback" role="alert">
@@ -113,7 +143,7 @@
                                 <label for="planning" class="col-md-4 col-form-label text-md-right">{{ __('Planning') }}</label>
 
                                 <div class="col-md-8">
-                                    <textarea id="planning" class="form-control @error('planning') is-invalid @enderror" name="planning" rows="5"></textarea>
+                                    <textarea id="planning" class="form-control @error('planning') is-invalid @enderror" name="planning" rows="5">{{ old('planning') }}</textarea>
 
                                     @error('planning')
                                         <span class="invalid-feedback" role="alert">
@@ -138,17 +168,62 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script type="text/javascript">
-        var i = 0;
+        let url = new URL(window.location.href);
+        let input = url.searchParams.get('input-counter');
+
+        url.searchParams.delete('input-counter');
+        window.history.replaceState(null, '', url);
+
+        let inputCounter = input ?? 0;
+
+        for (var i = 1; i <= inputCounter; i++) {
+            $("#dynamicAddRemove").append(
+                `<div class="row mt-2">
+                    <button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control @error("tasks.`+i+`.task_id") is-invalid @enderror" name="tasks[${i}][task_id]">
+                        @error("tasks.'+i+'.task_id")<span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>@enderror
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control @error("tasks.`+i+`.spent_time") is-invalid @enderror" name="tasks[${i}][spent_time]">
+                        @error("tasks.'+i+'.spent_time")<span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>@enderror</div>
+                    <div class="col-md-7">
+                        <textarea class="form-control @error("tasks.`+i+`.content") is-invalid @enderror" name="tasks[${i}][task_id]" rows="2">{{ old("tasks.`+i+`.content") }}</textarea>
+                        @error("tasks.'+i+'.task_id")<span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>@enderror
+                    </div>
+                </div>`
+            );
+        }
+
         $("#dynamic-ar").click(function () {
-            ++i;
-            $("#dynamicAddRemove").append('<div class="row mt-2"><button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>' +
-                '<div class="col-md-2"><input type="text" class="form-control" name="tasks['+i+'][task_id]"></div>' + 
-                '<div class="col-md-2"><input type="text" class="form-control" name="tasks['+i+'][spent_time]"></div>' + 
-                '<div class="col-md-7"><textarea class="form-control" name="tasks['+i+'][content]" rows="2"></textarea></div></div>');
+            ++inputCounter;
+            document.querySelector('#input-counter').value = inputCounter;
+
+            $("#dynamicAddRemove").append(
+                `<div class="row mt-2">
+                    <button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="tasks[${inputCounter}][task_id]">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="tasks[${inputCounter}][spent_time]">
+                    </div>
+                    <div class="col-md-7">
+                        <textarea class="form-control" name="tasks[${inputCounter}][content]" rows="2"></textarea>
+                    </div>
+                </div>`
+            );
         });
         $(document).on('click', '.remove-input-field', function (e) {
             e.currentTarget.parentNode.remove();
+            inputCounter--;
+            document.querySelector('#input-counter').value = inputCounter;
+        });
+
+        let form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            url += '?input-counter=' + inputCounter
+            window.history.pushState({}, '', url)
         });
     </script>
 @endsection
-
