@@ -9,6 +9,9 @@
     <!-- Bootstrap core CSS -->
     <link href="{!! url('assets/bootstrap/css/bootstrap.min.css') !!}" rel="stylesheet">
     <script src="{!! url('assets/bootstrap/js/bootstrap.bundle.min.js') !!}"></script>
+
+    <!-- Custom CSS -->
+    <link href="{!! url('assets/css/app.css') !!}" rel="stylesheet">
 </head>
 <body>
     <div class="container-fluid h-100">

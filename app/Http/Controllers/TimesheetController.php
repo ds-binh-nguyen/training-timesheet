@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\TimesheetStoreRequest;
-use App\Http\Requests\TimesheetUpdateRequest;
+use App\Http\Requests\StoreTimesheetRequest;
+use App\Http\Requests\UpdateTimesheetRequest;
 use App\Services\Interfaces\TimesheetServiceInterface;
 
 class TimesheetController extends Controller
@@ -43,7 +43,7 @@ class TimesheetController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(TimesheetStoreRequest $request)
+    public function store(StoreTimesheetRequest $request)
     {
         $params = $request->only([
             'time_check_in',
@@ -91,7 +91,7 @@ class TimesheetController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(TimesheetUpdateRequest $request, $id)
+    public function update(UpdateTimesheetRequest $request, $id)
     {
         $params = $request->only([
             'time_check_out',

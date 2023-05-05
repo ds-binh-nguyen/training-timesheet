@@ -83,27 +83,63 @@
                                                 <button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>
                                             @endif
                                             <div class="col-md-2">
-                                                <input type="text" class="form-control @error(`tasks.{$index}.task_id`) is-invalid @enderror"
-                                                    name="tasks[{{$index}}][task_id]" value="{{ $task->task_id }}">
-                                                @error(`tasks.{$index}.task_id`)
+                                                <input type="text" class="form-control @error('tasks.'.$index.'.task_id') is-invalid @enderror"
+                                                    name="tasks[{{ $index }}][task_id]" value="{{ $task->task_id }}">
+                                                @error('tasks.'.$index.'.task_id')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
                                                     </span>
                                                 @enderror
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" class="form-control @error(`tasks.{$index}.spent_time`) is-invalid @enderror"
-                                                    name="tasks[{{$index}}][spent_time]" value="{{ $task->spent_time }}">
-                                                @error(`tasks.{$index}.spent_time`)
+                                                <input type="text" class="form-control @error('tasks.'.$index.'.spent_time') is-invalid @enderror"
+                                                    name="tasks[{{ $index }}][spent_time]" value="{{ $task->spent_time }}">
+                                                @error('tasks.'.$index.'.spent_time')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
                                                     </span>
                                                 @enderror
                                             </div>
                                             <div class="col-md-7">
-                                                <textarea class="form-control @error(`tasks.{$index}.content`) is-invalid @enderror"
-                                                    name="tasks[{{$index}}][content]" rows="2">{{ $task->content }}</textarea>
-                                                @error(`tasks.{$index}.content`)
+                                                <textarea class="form-control @error('tasks.'.$index.'.content') is-invalid @enderror"
+                                                    name="tasks[{{ $index }}][content]" rows="2">{{ $task->content }}</textarea>
+                                                @error('tasks.'.$index.'.content')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                    @foreach (old('tasks', []) as $key => $task)
+                                        @if($key < count($timesheet->tasks))
+                                            @continue
+                                        @endif
+                                        <div class="row mt-2">
+                                            <button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control @error('tasks.'.$key.'.task_id') is-invalid @enderror" 
+                                                    name="tasks[{{ $key }}][task_id]" value="{{ $task['task_id'] }}">
+                                                @error('tasks.'.$key.'.task_id')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control @error('tasks.'.$key.'.spent_time') is-invalid @enderror"
+                                                    name="tasks[{{ $key }}][spent_time]" value="{{ $task['spent_time'] }}">
+                                                @error('tasks.'.$key.'.spent_time')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-7">
+                                                <textarea class="form-control @error('tasks.'.$key.'.content') is-invalid @enderror"
+                                                    name="tasks[{{ $key }}][content]" rows="2">{{ $task['content'] }}</textarea>
+                                                @error('tasks.'.$key.'.content')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
                                                     </span>
@@ -175,16 +211,27 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script type="text/javascript">
-        var i = {{ count($timesheet->tasks) - 1 }};
+        var inputCounter = {{ count($timesheet->tasks) - 1 }};
         $("#dynamic-ar").click(function () {
-            ++i;
-            $("#dynamicAddRemove").append('<div class="row mt-2"><button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>' +
-                '<div class="col-md-2"><input type="text" class="form-control" name="tasks['+i+'][task_id]"></div>' + 
-                '<div class="col-md-2"><input type="text" class="form-control" name="tasks['+i+'][spent_time]"></div>' + 
-                '<div class="col-md-7"><textarea class="form-control" name="tasks['+i+'][content]" rows="2"></textarea></div></div>');
+            inputCounter++;
+            $("#dynamicAddRemove").append(
+                `<div class="row mt-2">
+                    <button type="button" class="remove-input-field col-md-1 btn btn-danger" style="height: 38px">Delete</button>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="tasks[${inputCounter}][task_id]">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="tasks[${inputCounter}][spent_time]">
+                    </div>
+                    <div class="col-md-7">
+                        <textarea class="form-control" name="tasks[${inputCounter}][content]" rows="2"></textarea>
+                    </div>
+                </div>`
+            );
         });
         $(document).on('click', '.remove-input-field', function (e) {
             e.currentTarget.parentNode.remove();
+            inputCounter--;
         });
     </script>
 @endsection
