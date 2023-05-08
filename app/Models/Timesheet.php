@@ -34,4 +34,14 @@ class Timesheet extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get timesheets managed by user manager.
+     */
+    public function scopeManagedBy($query, $managerId)
+    {
+        $query->whereHas('user', function($q) use ($managerId) {
+            $q->where('manager_id', $managerId);
+        });
+    }
 }
