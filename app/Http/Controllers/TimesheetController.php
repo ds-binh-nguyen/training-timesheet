@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTimesheetRequest;
 use App\Http\Requests\UpdateTimesheetRequest;
+use App\Models\Timesheet;
 use App\Services\Interfaces\TimesheetServiceInterface;
 
 class TimesheetController extends Controller
@@ -64,9 +65,9 @@ class TimesheetController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Timesheet $timesheet)
     {
-        $timesheet = $this->timesheetService->getByIdWithTasks($id);
+        $this->authorize('view', $timesheet);
 
         return view('timesheets.show', compact('timesheet'));
     }
@@ -77,10 +78,8 @@ class TimesheetController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Timesheet $timesheet)
     {
-        $timesheet = $this->timesheetService->getByIdWithTasks($id);
-
         return view('timesheets.edit', compact('timesheet'));
     }
 
@@ -105,16 +104,34 @@ class TimesheetController extends Controller
         return redirect()->route('timesheets.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function list()
     {
-        $this->timesheetService->destroy($id);
+        $this->authorize('view-list', Timesheet::class);
 
-        return redirect()->route('timesheets.index');
+        // TODO handle function list all timesheets 
+        // (depend role admin or manager will have different query)
+
+        // example get data with role manager
+        $timesheets = Timesheet::managedBy(auth()->user()->id)->get();
+
+        return view('timesheets.list-all', compact('timesheets'));
+    }
+
+    public function export()
+    {
+        $this->authorize('export', Timesheet::class);
+
+        // TODO handle function export all timesheets
+
+        return 'export';
+    }
+
+    public function approve(Timesheet $timesheet)
+    {
+        $this->authorize('approve', $timesheet);
+
+        // TODO handle function approve timesheet
+
+        return 'approve';
     }
 }

@@ -7,9 +7,16 @@
         <li class="nav-item">
             <a href="/timesheets" class="nav-link link-dark">Timesheets</a>
         </li>
+        @can('view-list', App\Timesheet::class)
+        <li class="nav-item">
+            <a href="/timesheet-management" class="nav-link link-dark">Timesheet Management</a>
+        </li>
+        @endcan
+        @can('manage-users')
         <li>
             <a href="/users" class="nav-link link-dark">Users</a>
         </li>
+        @endcan
         <li>
             <a href="#" class="nav-link link-dark">Tools</a>
         </li>
