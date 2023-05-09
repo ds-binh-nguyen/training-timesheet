@@ -23,7 +23,7 @@ class TimesheetController extends Controller
      */
     public function index()
     {
-        $timesheets = $this->timesheetService->getAll();
+        $timesheets = $this->timesheetService->getByCurrentUser();
 
         return view('timesheets.index', compact('timesheets'));
     }
@@ -69,6 +69,8 @@ class TimesheetController extends Controller
     {
         $this->authorize('view', $timesheet);
 
+        $timesheet = $this->timesheetService->getByIdWithTasks($timesheet->id);
+
         return view('timesheets.show', compact('timesheet'));
     }
 
@@ -80,6 +82,8 @@ class TimesheetController extends Controller
      */
     public function edit(Timesheet $timesheet)
     {
+        $timesheet = $this->timesheetService->getByIdWithTasks($timesheet->id);
+
         return view('timesheets.edit', compact('timesheet'));
     }
 
@@ -108,11 +112,7 @@ class TimesheetController extends Controller
     {
         $this->authorize('view-list', Timesheet::class);
 
-        // TODO handle function list all timesheets 
-        // (depend role admin or manager will have different query)
-
-        // example get data with role manager
-        $timesheets = Timesheet::managedBy(auth()->user()->id)->get();
+        $timesheets = $this->timesheetService->getAll();
 
         return view('timesheets.list-all', compact('timesheets'));
     }
@@ -121,9 +121,7 @@ class TimesheetController extends Controller
     {
         $this->authorize('export', Timesheet::class);
 
-        // TODO handle function export all timesheets
-
-        return 'export';
+        return $this->timesheetService->export();
     }
 
     public function approve(Timesheet $timesheet)
