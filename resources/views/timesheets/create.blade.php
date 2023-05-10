@@ -19,8 +19,10 @@
                         <form method="POST" action="{{ route('timesheets.store') }}">
                             @csrf
                             <div class="form-group row">
-                                <label for="date" class="col-md-4 col-form-label text-md-right">{{ __('Date') }}</label>
-
+                                <label for="date" class="col-md-4 col-form-label text-md-right">
+                                    {{ __('Date') }}
+                                    <label style="color:red"> *</label>
+                                </label>
                                 <div class="col-md-8">
                                     {{-- fake date for time_check_in --}}
                                     <input id="date" type="date" class="form-control @error('time_check_in') is-invalid @enderror" name="time_check_in" value="{{ old('time_check_in') }}">
@@ -165,7 +167,10 @@
                             </div>
 
                             <div class="form-group row mt-3">
-                                <label for="planning" class="col-md-4 col-form-label text-md-right">{{ __('Planning') }}</label>
+                                <label for="planning" class="col-md-4 col-form-label text-md-right">
+                                    {{ __('Planning') }}
+                                    <label style="color:red"> *</label>
+                                </label>
 
                                 <div class="col-md-8">
                                     <textarea id="planning" class="form-control @error('planning') is-invalid @enderror" name="planning" rows="5">{{ old('planning') }}</textarea>

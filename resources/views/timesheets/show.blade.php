@@ -103,13 +103,6 @@
                         <div class="form-group row mt-3 mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <a href="{{ route('timesheets.edit', $timesheet->id) }}" class="btn btn-primary">{{ __('Edit') }}</a>
-                                @can('approve', $timesheet)
-                                    <form method="POST" action="{{ route('timesheet-management.approve', ['timesheet' => $timesheet->id]) }}" style="display: inline;">
-                                        @csrf
-                                        @method('PUT')
-                                        <button type="submit" class="btn btn-success">{{ __('Approve') }}</button>
-                                    </form>
-                                @endcan
                             </div>
                         </div>
                     </div>

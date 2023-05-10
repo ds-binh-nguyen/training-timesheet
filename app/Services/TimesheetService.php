@@ -2,16 +2,18 @@
 
 namespace App\Services;
 
+use App\Exports\TimesheetExport;
 use App\Models\Timesheet;
 use App\Services\Interfaces\TimesheetServiceInterface;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TimesheetService extends BaseService implements TimesheetServiceInterface
 {
-    public function getAll()
+    public function getByCurrentUser()
     {
-        return Timesheet::where('user_id', auth()->user()->id)
+        return Timesheet::where('user_id', auth()->id())
             ->with('tasks')
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate(10);
     }
 
@@ -39,9 +41,7 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
         $timesheet->update($data);
 
         $timesheet->tasks()->delete();
-        $tasks = array_filter($data['tasks'], function($task) {
-            return !empty(array_filter($task));
-        });
+        $tasks = array_filter($data['tasks'], fn($task) => !empty(array_filter($task)));
         if (!empty($tasks)) {
             $timesheet->tasks()->createMany($tasks);
         }
@@ -49,8 +49,40 @@ class TimesheetService extends BaseService implements TimesheetServiceInterface
         return $timesheet;
     }
 
-    public function destroy(int $id)
+    public function getAll()
     {
-        return $this->getById($id)->delete();
+        $user = auth()->user();
+
+        if ($user->isAdmin()) {
+            return $this->getByAdmin();
+        }
+
+        if ($user->isManager()) {
+            return $this->getByManager($user->id);
+        }
+
+        return null;
+    }
+
+    private function getByManager(int $userId)
+    {
+        return Timesheet::with('tasks', 'user')
+            ->managedBy($userId)
+            ->latest()
+            ->paginate(10);
+    }
+
+    private function getByAdmin()
+    {
+        return Timesheet::with('tasks')
+            ->latest()
+            ->paginate(10);
+    }
+
+    public function export()
+    {
+        $data = Timesheet::with('user')->get();
+
+        return Excel::download(new TimesheetExport($data), 'timesheet.xlsx');
     }
 }
