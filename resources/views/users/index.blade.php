@@ -1,5 +1,9 @@
 @extends('layouts.app-master')
 
 @section('content')
-Manage Users Page
+    <div>
+        @foreach($users as $user)
+            {{ $user->username }}
+        @endforeach
+    </div>
 @endsection

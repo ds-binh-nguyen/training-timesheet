@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Services\Interfaces\TimesheetServiceInterface;
+use App\Services\Interfaces\UserServiceInterface;
 use App\Services\TimesheetService;
+use App\Services\UserService;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
@@ -11,6 +13,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public $bindings = [
         TimesheetServiceInterface::class => TimesheetService::class,
+        UserServiceInterface::class => UserService::class,
     ];
 
     /**
